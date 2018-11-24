@@ -1,33 +1,22 @@
 import React, {Component} from "react";
 import {Image, Text, View, StyleSheet, TouchableOpacity} from "react-native";
 import {BLANC} from "../constants/colors";
-
+import CustomParser from "../utils/CustomParser.util"
 export default class ItemList extends Component {
-    cropText(text, size) {
-        console.log(size)
-        let x = text;
-        if (text) {
-            if (text.length > size - 1) {
-                return x.substring(0, size) + "...";
-
-            } else {
-                return text;
-            }
-        }
-    }
 
     render() {
-        const {image, title, description,} = this.props;
+        const {image, title, description,Action} = this.props;
+
 
         return (
 
-            <TouchableOpacity onPress={()=>alert("Navegar")} style={styles.container}>
+            <TouchableOpacity onPress={Action} style={styles.container}>
                 <View style={styles.image_container}>
-                    <Image style={styles.image} source={{uri: 'http://' + image}}/>
+                    <Image style={styles.image} source={{uri: image}}/>
                 </View>
                 <View style={styles.new_container}>
                     <Text style={styles.title}>{title}</Text>
-                    <Text style={styles.description}>{this.cropText((description).toString(), 46)}</Text>
+                    <Text style={styles.description}>{CustomParser.cropText((description).toString(), 90)}</Text>
                 </View>
             </TouchableOpacity>
         );

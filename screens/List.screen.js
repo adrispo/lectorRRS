@@ -1,11 +1,9 @@
 import React, {Component} from "react";
 import {Text, View, ListView, Image, TextInput, Button, TouchableOpacity} from "react-native";
-import {parseString} from 'react-native-xml2js';
 import ItemList from "../components/ItemList.component";
 import {BLANC, BLUE, DARK_PURPLE, GRAY, GRAY_50, PINK, PURPLE} from "../constants/colors";
 import ImagePlatform from "../components/common/ImagePlatform";
-
-let DomParser = require('react-native-html-parser').DOMParser;
+import CustomParser from  "../utils/CustomParser.util"
 
 export default class List extends Component {
     static navigationOptions = {
@@ -25,6 +23,12 @@ export default class List extends Component {
         ),
     };
 
+    navegar=(article,image)=>()=>{
+        this.props.navigation.navigate('Details', {
+            article: article,
+        });
+    };
+
     constructor(props) {
         super(props);
         const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
@@ -33,30 +37,25 @@ export default class List extends Component {
         }
     }
 
-    renderRow(rowData) {
-        console.log(rowData);
-        let myRegex = /<img[^>]+src="(\/\/[^">]+)"/g;
-        let doc = new DomParser().parseFromString(rowData.description.toString(), 'text/html');
-        let image = myRegex.exec(rowData.description);
-        let string = rowData.description.toString();
+    renderRow(article) {
+
+
         return (
-            <ItemList image={image[1]} title={rowData.title} description={rowData.description}/>
+            <ItemList Action={this.navegar(article)} image={article.thumbnail} title={article.title} description={CustomParser.stripText(article.description)}/>
         )
     }
-
     componentDidMount() {
         let _this = this;
-        return fetch('https://www.xatakandroid.com/tag/feeds/rss2.xml')
-            .then(response => response.text())
+
+        return fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.20minutos.es%2Frss%2F&api_key=u7mngxkjt257kswaczx2j3wvy4efzgvsacvbabsh')
             .then((response) => {
-                parseString(response, function (err, result) {
-                    let noticias = [];
-                    noticias = result.rss.channel[0].item;
-                    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-                    _this.setState({
-                        dataSource: ds.cloneWithRows(noticias)
-                    })
-                });
+                let json = JSON.parse(response._bodyText);
+                let noticias = [];
+                noticias = json.items;
+                const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+                _this.setState({
+                    dataSource: ds.cloneWithRows(noticias)
+                })
             }).catch((err) => {
                 console.log('fetch', err)
             })
