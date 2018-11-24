@@ -1,10 +1,16 @@
 /**
  * Class with utilities to handle string (Module pattern)
+ *
+ * En este caso, el patron se utiliza para tener una clase de utilidad
+ * para manejar de una manera más ordenada todas las funciones de manipulación de
+ * strings en una misma clase.
+ * Se podrían tener métodos privados a su vez para compartir entre los métodos públicos
+ *
  */
 export default CustomParser = (function () {
 
     // Private variables
-    const tags_replace = /<(?:.|\n)*?>/gm;
+    const tags_replace_html = /<(?:.|\n)*?>/gm;
 
 
     //Public methods
@@ -34,7 +40,7 @@ export default CustomParser = (function () {
          * @returns {string|*|XML|void}
          */
         stripText: function (text) {
-            return text.replace(tags_replace, '');
+            return text.replace(tags_replace_html, '');
         }
     }
 }());
