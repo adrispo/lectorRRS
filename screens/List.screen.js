@@ -1,11 +1,13 @@
 import React, {Component} from "react";
-import {Text, View, ListView, Image, TextInput, Button, TouchableOpacity} from "react-native";
+import {FlatList, Text, TextInput,StyleSheet, TouchableOpacity, View} from "react-native";
 import ItemList from "../components/ItemList.component";
-import {BLANC, BLUE, DARK_PURPLE, GRAY, GRAY_50, PINK, PURPLE} from "../constants/colors";
+import {BLANC, DARK_PURPLE, GRAY_50, PINK, PURPLE} from "../constants/colors";
 import ImagePlatform from "../components/common/ImagePlatform";
-import CustomParser from  "../utils/CustomParser.util"
+import CustomParser from "../utils/CustomParser.util"
+import {URL_RSS} from "../constants/constants";
 
 export default class List extends Component {
+    //Header nav options
     static navigationOptions = {
         title: 'Home',
         headerStyle: {
@@ -16,114 +18,172 @@ export default class List extends Component {
             fontWeight: 'bold',
         },
         headerRight: (
-            <TouchableOpacity style={{padding:4}} onPress={() => alert('This is a button!')}>
+            <TouchableOpacity style={{padding:4}} onPress={() => alert('Config Screen')}>
                 <ImagePlatform style={{width:40,height:40}} imagen_ios={require('../assest/images/header/config_ios.png')}
                                imagen_android={require('../assest/images/header/config_android.png')}/>
             </TouchableOpacity>
         ),
     };
 
+    //constructor and state
+    constructor(props) {
+        super(props);
+        this.state = {
+            news : [], //Store all news
+            newsSearch : [], //Store new filtered
+            search_text : '', //search box
+        }
+    }
+
+    //Component did mount
+    componentDidMount() {
+        let _this = this;
+
+        return fetch(URL_RSS)
+            .then((response) => {
+                let json = JSON.parse(response._bodyText);
+                let noticias = noticias = json.items;
+                _this.setState({
+                    news: noticias,
+                    newsSearch: noticias,
+                })
+            }).catch((err) => {
+                console.log('fetch', err)
+            })
+    }
+    //Function for go Details screen
     navegar=(article,image)=>()=>{
         this.props.navigation.navigate('Details', {
             article: article,
         });
     };
 
-    constructor(props) {
-        super(props);
-        const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-        this.state = {
-            dataSource: ds.cloneWithRows([]),
-        }
-    }
+    //Search on array bu title
+    searchFilterFunction = text => {
+        this.setState({
+            search_text: text,
+        });
+        const newData = this.state.news.filter(item => {
+            const itemData = item.title.toUpperCase();
+            const textData = text.toUpperCase();
+            return itemData.indexOf(textData) > -1;
+        });
+        this.setState({ newsSearch: newData });
+    };
 
+
+    /**
+     * Remder item list
+     * @param article
+     * @returns {XML}
+     */
     renderRow(article) {
-
-
         return (
             <ItemList Action={this.navegar(article)} image={article.thumbnail} title={article.title} description={CustomParser.stripText(article.description)}/>
         )
     }
-    componentDidMount() {
-        let _this = this;
-
-        return fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.20minutos.es%2Frss%2F&api_key=u7mngxkjt257kswaczx2j3wvy4efzgvsacvbabsh')
-            .then((response) => {
-                let json = JSON.parse(response._bodyText);
-                let noticias = [];
-                noticias = json.items;
-                const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-                _this.setState({
-                    dataSource: ds.cloneWithRows(noticias)
-                })
-            }).catch((err) => {
-                console.log('fetch', err)
-            })
-    }
 
     render() {
         return (
-            <View style={{flex: 1, backgroundColor: PURPLE}}>
-                <View style={{
-                    height: 70,
-                    marginBottom: 8,
-                    flexDirection: 'row',
-                    alignContent: 'center',
-                    alignItems: 'center',
-                    paddingLeft: 8
-                }}>
+            <View style={styles.container}>
+                <View style={styles.header_container}>
                     <View>
-                        <Text style={{color: BLANC, fontSize: 30}}>News</Text>
+                        <Text style={styles.texto_news}>News</Text>
                     </View>
-                    <View style={{
-                        alignSelf: 'center',
-                        justifyContent: 'center',
-                        alignContent: 'center',
-                        alignItems: 'center',
-                        height: 20,
-                        width: 20,
-                        borderRadius: 20 / 2,
-                        backgroundColor: PINK,
-                        marginTop: 8,
-                        marginLeft: 8,
-                    }}>
-                        <Text style={{color: BLANC, fontSize: 12}}>8</Text>
+                    <View style={styles.badge_news}>
+                        <Text style={styles.text_badge}>{this.state.newsSearch.length}</Text>
                     </View>
-                    <View style={{
-                        height: 40,
-                        marginLeft: 16,
-                        marginRight: 8,
-                        flex: 1,
-                        backgroundColor: GRAY_50,
-                        borderRadius: 40,
-                        flexDirection: 'row',
-                        justifyItems: 'center',
-                        alignContent: 'center',
-                        alignItems: 'center',
-
-                    }}>
-                        <View style={{flex:1}}>
+                    <View style={styles.search_container}>
+                        <View style={styles.flex}>
                             <TextInput
-                                style={{marginLeft: 16, flex: 1, marginTop:2, opacity:0.5}}
-                                value={this.state.text}
+                                style={styles.search_input}
+                                value={this.state.search_text}
                                 placeholder='Search'
+                                onChangeText={text => this.searchFilterFunction(text)}
                             />
                         </View>
                         <ImagePlatform
-                            style={{alignSelf: 'center', marginRight: 8, width: 20, height: 20, opacity: 0.3}}
+                            style={styles.search_image}
                             imagen_ios={require('../assest/images/list/lupa_ios.png')}
                             imagen_android={require('../assest/images/list/lupa_android.png')}/>
                     </View>
                 </View>
-                <View style={{flex: 1, marginTop: 1}}>
-                    <ListView
-                        style={{flex: 1}}
-                        dataSource={this.state.dataSource}
-                        renderRow={this.renderRow.bind(this)}
-                        enableEmptySections
+                <View style={styles.list}>
+                    <FlatList
+                        style={styles.flex}
+                        data={this.state.newsSearch}
+                        renderItem={({item}) => this.renderRow(item)}
+                        keyExtractor={item => item.pubDate}
                     />
                 </View>
             </View>
         );
     }
 }
+
+const styles = StyleSheet.create({
+    flex:{
+        flex:1,
+    },
+    container:{
+        flex: 1,
+        backgroundColor: PURPLE
+    },
+    header_container: {
+        height: 70,
+        marginBottom: 8,
+        flexDirection: 'row',
+        alignContent: 'center',
+        alignItems: 'center',
+        paddingLeft: 8
+    },
+    texto_news :{
+        color: BLANC,
+        fontSize: 30
+    },
+    badge_news:{
+        alignSelf: 'center',
+        justifyContent: 'center',
+        alignContent: 'center',
+        alignItems: 'center',
+        height: 20,
+        width: 20,
+        borderRadius: 20 / 2,
+        backgroundColor: PINK,
+        marginTop: 8,
+        marginLeft: 8,
+    },
+    text_badge:{
+        color: BLANC,
+        fontSize: 12
+    },
+    search_container:{
+        height: 40,
+        marginLeft: 16,
+        marginRight: 8,
+        flex: 1,
+        backgroundColor: GRAY_50,
+        borderRadius: 40,
+        flexDirection: 'row',
+        alignContent: 'center',
+        alignItems: 'center',
+
+    },
+    search_input:{
+        marginLeft: 16,
+        flex: 1,
+        marginTop:2,
+        opacity:0.5
+    },
+    search_image:{
+        alignSelf: 'center',
+        marginRight: 8,
+        width: 20,
+        height: 20,
+        opacity: 0.3
+    },
+    list:{
+        flex: 1,
+        marginTop: 1
+    }
+});
