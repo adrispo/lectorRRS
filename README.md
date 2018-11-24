@@ -1,4 +1,4 @@
-#lectorRRS
+# lectorRRS
 
 Librerias usadas:
 
@@ -12,10 +12,10 @@ Libreria usada para la navegación entre las pantallas, en este caso la versión
 ### react-native-gesture-handler
 Es necesaria para la última versión de la librería 'react-navigation' 
 
-###react-native-rss-parser
+### react-native-rss-parser
 Para facilitar la tarea de parsear el xml del rss
 
-##Patrones de diseño
+## Patrones de diseño
 
-###Module pattern
+### Module pattern
 En la clase CustomParser para poder tener organizadas todas las funciones de manipulación de strings
