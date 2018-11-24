@@ -1,10 +1,21 @@
+/**
+ * Class with utilities to handle string (Module pattern)
+ */
 export default CustomParser = (function () {
-    // Private variables / properties
+
+    // Private variables
     const tags_replace = /<(?:.|\n)*?>/gm;
 
 
     //Public methods
     return {
+        /**
+         * Function that crop text depends of the length you want
+         *
+         * @param text
+         * @param size
+         * @returns {*}
+         */
         cropText: function (text, size) {
             let x = text;
             if (text) {
@@ -16,7 +27,12 @@ export default CustomParser = (function () {
                 }
             }
         },
-
+        /**
+         * Funtion to remove html tags
+         *
+         * @param text
+         * @returns {string|*|XML|void}
+         */
         stripText: function (text) {
             return text.replace(tags_replace, '');
         }

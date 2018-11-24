@@ -6,8 +6,6 @@ export default class ItemList extends Component {
 
     render() {
         const {image, title, description,Action} = this.props;
-
-
         return (
 
             <TouchableOpacity onPress={Action} style={styles.container}>
@@ -16,7 +14,11 @@ export default class ItemList extends Component {
                 </View>
                 <View style={styles.new_container}>
                     <Text style={styles.title}>{title}</Text>
+
                     <Text style={styles.description}>{CustomParser.cropText((description).toString(), 90)}</Text>
+                    <View style={styles.continue_readring}>
+                        <Text>Continue reading...</Text>
+                    </View>
                 </View>
             </TouchableOpacity>
         );
@@ -35,6 +37,11 @@ const styles = StyleSheet.create({
         padding:16,
         width:150,
 
+    },
+    continue_readring: {
+        position:'absolute',
+        bottom: 0,
+        right:0
     },
     image: {
         borderRadius: 8,
