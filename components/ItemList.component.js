@@ -14,9 +14,8 @@ export default class ItemList extends Component {
                 </View>
                 <View style={styles.new_container}>
                     <Text style={styles.title}>{title}</Text>
-
                     <Text style={styles.description}>{CustomParser.cropText((description).toString(), 90)}</Text>
-                    <View style={styles.continue_readring}>
+                    <View style={styles.continue_reading}>
                         <Text>Continue reading...</Text>
                     </View>
                 </View>
@@ -38,7 +37,7 @@ const styles = StyleSheet.create({
         width:150,
 
     },
-    continue_readring: {
+    continue_reading: {
         position:'absolute',
         bottom: 0,
         right:0
